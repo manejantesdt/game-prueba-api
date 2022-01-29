@@ -1,28 +1,29 @@
 const { Router } = require("express");
 // Importar todos los routers;
 // Ejemplo: const authRouter = require('./auth.js');
-const { Player } = require("../db.js");
+const { Player, Avatar } = require("../db.js");
 
 const router = Router();
 
 // Configurar los routers
 // Ejemplo: router.use('/auth', authRouter);
 
-const getDbInfo = async () => {
+const getPlayerInfo = async () => {
   return await Player.findAll();
 };
 
-console.log(getDbInfo, "soy get info")
-console.log(Player)
+const getAvatarInfo = async () => {
+  return await Avatar.findAll();
+};
 
 router.get("/players", async (req, res, next) => {
   try {
-    const nickName = req.query.nickName;
-    let allPlayers = await getDbInfo(); //me traigo todos los players de la Db
-    if (nickName) {
+    const nick_name = req.query.nickname;
+    let allPlayers = await getPlayerInfo(); //me traigo todos los players de la Db
+    if (nick_name) {
       // si hay un nickname por query
       let playerNickname = await allPlayers.filter((player) =>
-        player.nickname.toLowerCase().includes(nickname.toLowerCase())
+        player.nickname.toLocaleLowerCase().includes(nick_name.toLocaleLowerCase())
       );
       playerNickname.length
         ? res.status(200).send(playerNickname)
@@ -39,12 +40,12 @@ router.get("/players", async (req, res, next) => {
   }
 });
 
-router.get("/player/:Id", async function (req, res, next) {
+router.get("/players/:Id", async function (req, res, next) {
   try {
     const Id = req.params.Id;
-    const playerTotal = await getDbInfo();
+    const playerTotal = await getPlayerInfo();
     if (Id) {
-      let playerId = await playerTotal.filter((el) => el.Id == Id); //dentro de todos los dogs filtra el id que te estoy pasando
+      let playerId = await playerTotal.filter((el) => el.Id == Id); 
       playerId.length //si no encuentra nada entra en la res.status
         ? res.status(200).send(playerId)
         : res.status(404).send({ info: "Player not found" });
@@ -70,11 +71,12 @@ router.post("/player", async (req, res, next) => {
   }
 });
 
-router.put("/editPlayer", async (req, res, next) => {
+router.put("/editPlayer/:Id", async (req, res, next) => {
   try {
     const { Id } = req.params;
     const { nickname, status, ranking, avatar } = req.body;
     const player = await Player.findByPk(Id);
+    console.log(Id)
     player.update({
       nickname,
       status,
@@ -84,10 +86,11 @@ router.put("/editPlayer", async (req, res, next) => {
     res.send(player);
   } catch (error) {
     next(error);
+    console.log(error)
   }
   });
 
-router.delete("/deletePlayer", async (req, res, next) => {
+router.delete("/deletePlayer/:Id", async (req, res, next) => {
     try {
       const { Id } = req.params;
       const player = await Player.findByPk(Id);
@@ -97,5 +100,31 @@ router.delete("/deletePlayer", async (req, res, next) => {
       next(error);
     }
   });
+
+router.post("/createAvatar", async (req, res, next) => {
+  try {
+    const { image } = req.body;
+    const newAvatar = await Avatar.create({
+      image,
+    });
+    await newAvatar;
+    res.status(201).send({ info: "Avatar created successfully!" });
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/getAvatar", async (req, res, next) => {
+  try {
+    const avatarImg = req.query.avatar;
+    let allAvatars = await getAvatarInfo(); 
+    {
+      res.status(200).send(allAvatars);
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
 
 module.exports = router;
