@@ -44,14 +44,14 @@ router.get("/players", async (req, res, next) => {
       status === "plata" ||
       status === "oro"
     ) {
-      if (status === "bronce") {
-        allPlayers = allPlayers.filter((player) => {
-          return player.status === "bronce";
-        });
-      }
       if (status === "plata") {
         allPlayers = allPlayers.filter((player) => {
           return player.status === "plata";
+        });
+      }
+      if (status === "bronce") {
+        allPlayers = allPlayers.filter((player) => {
+          return player.status === "bronce";
         });
       }
       if (status === "oro") {
