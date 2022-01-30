@@ -15,7 +15,7 @@ module.exports = (sequelize) => {
         allowNull: false,
       },
       status: {
-        type: DataTypes.ENUM("Oro", "Plata", "Bronce"),
+        type: DataTypes.STRING,
         defaultValue: "Bronce",
         allowNull: false,
       },
@@ -25,7 +25,8 @@ module.exports = (sequelize) => {
       },
       avatar: {
         type: DataTypes.STRING,
-        defaultValue: "https://drive.google.com/thumbnail?id=1FvgHhPmYNwruvKSjok1dp-ikpKVD2O5z",
+        defaultValue:
+          "https://drive.google.com/thumbnail?id=1FvgHhPmYNwruvKSjok1dp-ikpKVD2O5z",
         allowNull: true,
       },
     },
