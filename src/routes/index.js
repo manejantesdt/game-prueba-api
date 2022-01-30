@@ -1,13 +1,8 @@
 const { Router } = require("express");
-// Importar todos los routers;
-// Ejemplo: const authRouter = require('./auth.js');
 const { Player, Avatar } = require("../db.js");
-
 const router = Router();
 
-// Configurar los routers
-// Ejemplo: router.use('/auth', authRouter);
-
+// -----------------------<Functions>-----------------------
 const getPlayerInfo = async () => {
   return await Player.findAll();
 };
@@ -15,13 +10,16 @@ const getPlayerInfo = async () => {
 const getAvatarInfo = async () => {
   return await Avatar.findAll();
 };
+// __________________________________________________________
+
+// -----------------------<Routes>---------------------------
 
 router.get("/players", async (req, res, next) => {
   try {
     const { nick_name, order, status } = req.query;
-    let allPlayers = await getPlayerInfo(); //me traigo todos los players de la Db
+    let allPlayers = await getPlayerInfo();
+
     if (nick_name) {
-      // si hay un nickname por query
       let playerNickname = await allPlayers.filter((player) =>
         player.nickname
           .toLocaleLowerCase()
@@ -77,6 +75,9 @@ router.get("/players", async (req, res, next) => {
 //   }
 //   return res.send(allPlayers);
 // }
+
+// -------------------------<Get Id>------------------------
+
 router.get("/players/:Id", async function (req, res, next) {
   try {
     const Id = req.params.Id;
@@ -91,7 +92,9 @@ router.get("/players/:Id", async function (req, res, next) {
     next(error);
   }
 });
+// ______________________________________________________________
 
+// -------------------------<Post Player>------------------------
 router.post("/player", async (req, res, next) => {
   try {
     const { nickname, status, ranking, avatar } = req.body;
@@ -107,7 +110,9 @@ router.post("/player", async (req, res, next) => {
     next(error);
   }
 });
+// _____________________________________________________________
 
+// -------------------------<Put Player>------------------------
 router.put("/editPlayer/:Id", async (req, res, next) => {
   try {
     const { Id } = req.params;
@@ -126,7 +131,9 @@ router.put("/editPlayer/:Id", async (req, res, next) => {
     console.log(error);
   }
 });
+// _____________________________________________________________
 
+// -------------------------<Delete Player>---------------------
 router.delete("/deletePlayer/:Id", async (req, res, next) => {
   try {
     const { Id } = req.params;
@@ -138,6 +145,9 @@ router.delete("/deletePlayer/:Id", async (req, res, next) => {
   }
 });
 
+// ______________________________________________________________
+
+// -------------------------<Post Avatar>------------------------
 router.post("/createAvatar", async (req, res, next) => {
   try {
     const { image } = req.body;
@@ -150,7 +160,9 @@ router.post("/createAvatar", async (req, res, next) => {
     next(error);
   }
 });
+// ______________________________________________________________
 
+// -------------------------<Get Avatar>-------------------------
 router.get("/getAvatar", async (req, res, next) => {
   try {
     const avatarImg = req.query.avatar;
