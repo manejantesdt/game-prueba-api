@@ -16,20 +16,37 @@ const getAvatarInfo = async () => {
 
 router.get("/players", async (req, res, next) => {
   try {
-    const { nick_name, order, status } = req.query;
+    const { nick_name, order, status, amount } = req.query;
     let allPlayers = await getPlayerInfo();
 
     if (nick_name) {
-      let playerNickname = await allPlayers.filter((player) =>
-        player.nickname
-          .toLocaleLowerCase()
-          .includes(nick_name.toLocaleLowerCase())
-      );
-      playerNickname.length
-        ? res.status(200).send(playerNickname)
-        : res.status(404).send({
+      if (/^\d+$/.test(nick_name)) {
+        let playerId = await Player.findByPk(nick_name);
+        // let playerId = await Player.findByPk(parseInt(nick_name));
+        if (playerId) {
+          allPlayers = [playerId];
+        } else {
+          allPlayers = await allPlayers.filter((player) =>
+            player.nickname
+              .toLocaleLowerCase()
+              .includes(nick_name.toLocaleLowerCase())
+          );
+          allPlayers.length === 0 &&
+            res.status(404).send({
+              info: "Sorry, the player you are looking for does not exist.",
+            });
+        }
+      } else {
+        allPlayers = await allPlayers.filter((player) =>
+          player.nickname
+            .toLocaleLowerCase()
+            .includes(nick_name.toLocaleLowerCase())
+        );
+        allPlayers.length === 0 &&
+          res.status(404).send({
             info: "Sorry, the player you are looking for does not exist.",
           });
+      }
     }
     if ((order && order === "asc") || order === "desc" || order === "") {
       if (order === "asc" || order === "") {
@@ -42,8 +59,14 @@ router.get("/players", async (req, res, next) => {
     if (
       (status && status === "bronce") ||
       status === "plata" ||
-      status === "oro"
+      status === "oro" ||
+      status === "hierro"
     ) {
+      if (status === "hierro") {
+        allPlayers = allPlayers.filter((player) => {
+          return player.status === "hierro";
+        });
+      }
       if (status === "plata") {
         allPlayers = allPlayers.filter((player) => {
           return player.status === "plata";
@@ -60,21 +83,14 @@ router.get("/players", async (req, res, next) => {
         });
       }
     }
-
+    if (amount) {
+      allPlayers = allPlayers.slice(0, parseInt(amount));
+    }
     return res.send(allPlayers);
   } catch (error) {
     next(error);
   }
 });
-// if ((order && order === "asc") || order === "desc") {
-//   if (order === "desc") {
-//     allPlayers.sort((a, b) => b.ranking - a.ranking);
-//   }
-//   if (order === "asc") {
-//     allPlayers.sort((a, b) => a.ranking - b.ranking);
-//   }
-//   return res.send(allPlayers);
-// }
 
 // -------------------------<Get Id>------------------------
 
