@@ -14,6 +14,7 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      
       status: {
         type: DataTypes.STRING,
         defaultValue: "Bronce",
